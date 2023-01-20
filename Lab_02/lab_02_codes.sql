@@ -2,21 +2,24 @@ drop TABLE COURSE_;
 DROP TABLE STUDENT_;
 drop table DEPARTMENT_;
 
-CREATE USER tablespace_user Identified by t123 default TABLESPACE tbs2;
 
+-- 1 
 CREATE TABLESPACE tbs2
-    DATAFILE 'tbs2_data.dbf' SIZE 2m;
+DATAFILE 'tbs2_1_data.dbf' SIZE 2m;
+
+CREATE TABLESPACE tbs3
+DATAFILE 'tbs3_data.dbf' SIZE 5m;
 
 
+-- 2
+CREATE USER tablespace_user Identified by t123 default TABLESPACE tbs2;
 
 alter user tablespace_user QUOTA 1m on tbs2; 
 
-
-CREATE TABLESPACE tbs3
-    DATAFILE 'tbs3_data.dbf' SIZE 5m;
+alter user tablespace_user QUOTA 5m on tbs3;
 
 
-
+-- 3
 CREATE TABLE DEPARTMENT_
 (
     name VARCHAR(255),
@@ -36,6 +39,7 @@ CREATE TABLE STUDENT_
 tablespace tbs2;
 
 
+-- 4
 CREATE TABLE COURSE_
 ( 
     code VARCHAR(255),
@@ -46,6 +50,7 @@ CREATE TABLE COURSE_
     CONSTRAINT FK_COURSE foreign KEY (offer_by) references DEPARTMENT_(name)
 )
 tablespace tbs2;
+
 
 
 SELECT tablespace_name , bytes /1024/1024 MB
@@ -80,10 +85,6 @@ END;
 
 
 
-ALTER TABLESPACE tbs2
-ADD DATAFILE 'tbs2_2.dbf'
-SIZE 2m
-AUTOEXTEND ON;
 
 
 
@@ -97,5 +98,22 @@ CASCADE CONSTRAINTS;
 
 
 DROP TABLESPACE tbs2
-INCLUDING CONTENTS KEEP DATAFILES
+INCLUDING CONTENTS AND DATAFILES
 CASCADE CONSTRAINTS;
+
+
+-- bonus
+
+SELECT COUNT(table_name), TABLESPACE_NAME
+FROM DBA_TABLES
+GROUP by tablespace_name;
+
+
+SELECT tablespace_name, table_name
+from DBA_tables
+WHERE tablespace_name = 'TBS2';
+
+
+
+
+--- all done ---
