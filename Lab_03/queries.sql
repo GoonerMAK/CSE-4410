@@ -87,7 +87,6 @@ group by movie.mov_title);
 
 
 -- 3    
-
 CREATE OR REPLACE FUNCTION get_movie_earnings (id IN NUMBER)
 RETURN NUMBER
 AS
@@ -151,7 +150,7 @@ AS
     avg_rev_stars number(5,3);
 BEGIN
 
-    /* Calculating the average reviews across all genres */
+    /* Calculating the average number of reviews across all genres */
     Select floor(Sum(total_reviews)/count(total_reviews)) INTO avg_reviews   
     from (SELECT g.GEN_TITLE, COUNT(r.REV_ID) as total_reviews
     FROM RATING r
@@ -159,14 +158,15 @@ BEGIN
     JOIN GENRES g ON mt.GEN_ID = g.GEN_ID
     GROUP BY g.GEN_TITLE);
 
-    /* Calculating the average reviews given by the reviewers */
+    /* Calculating the average rating given by the reviewers */
     SELECT AVG(NVL(REV_STARS, 0)) INTO avg_rev_stars FROM RATING;
 
-
+    /* Calculating the number of reviewes and the average rating for each genre*/
     SELECT GEN_TITLE, COUNT(RATING.REV_ID), AVG(RATING.REV_STARS)
     INTO gen_title, review_count, avg_rating
     FROM GENRES , RATING , MTYPE 
-    where GENRES.GEN_ID = MTYPE.GEN_ID AND MTYPE.MOV_ID = RATING.MOV_ID AND GENRES.GEN_ID = MTYPE.gen_id AND  id = GENRES.GEN_ID
+    where GENRES.GEN_ID = MTYPE.GEN_ID AND MTYPE.MOV_ID = RATING.MOV_ID 
+        AND GENRES.GEN_ID = MTYPE.gen_id AND id = GENRES.GEN_ID
     GROUP BY GEN_TITLE;
 
     IF( review_count > avg_reviews ) THEN 
@@ -174,13 +174,14 @@ BEGIN
         ELSIF ( avg_rating > avg_rev_stars ) THEN Genre_Status := 'People''s Favorite';  
         END IF;
     
-    ELSIF ( review_count < avg_reviews  AND  avg_rating > avg_rev_stars ) THEN Genre_Status := 'Highly Rated';
+    ELSIF ( review_count < avg_reviews  AND  avg_rating > avg_rev_stars ) 
+    THEN Genre_Status := 'Highly Rated';
 
     ELSE Genre_Status := 'So So';
     END IF; 
 
-    RETURN 'Genre: ' || gen_title || '   Reivew_Count: ' || review_count || '   Average_Rating: ' || avg_rating
-            || '    Status: ' || Genre_Status;
+    RETURN 'Genre: ' || gen_title || '   Reivew_Count: ' || review_count ||
+        '   Average_Rating: ' || avg_rating || '    Status: ' || Genre_Status;
 END;
 /
 
@@ -215,33 +216,51 @@ SELECT AVG(NVL(REV_STARS, 0)) FROM RATING;
 
 -- 5
 
-
 CREATE OR REPLACE FUNCTION get_most_frequent_genre (p_start_date DATE, p_end_date DATE)
 RETURN VARCHAR2
 AS
   v_genre VARCHAR2(20);
   v_count NUMBER;
 BEGIN
-  SELECT g.gen_title, COUNT(*) as genre_count
-  INTO v_genre, v_count
-  FROM movie m, mtype mt, genres g
-  where  m.mov_id = mt.mov_id AND mt.gen_id = g.gen_id AND m.mov_releasedate 
-  BETWEEN p_start_date AND p_end_date
-  GROUP BY g.gen_title
-  ORDER BY v_count DESC;
 
-  RETURN v_genre || ' (' || v_count || ')';
+    SELECT gen_title, genre_count INTO v_genre, v_count FROM
+    (
+      /* Counting the number of movies that each genre had between the two dates */  
+      SELECT g.gen_title, COUNT(*) as genre_count
+      FROM movie m, mtype mt, genres g
+      where  m.mov_id = mt.mov_id AND mt.gen_id = g.gen_id AND m.mov_releasedate 
+      BETWEEN (p_start_date) AND (p_end_date)
+      GROUP BY g.gen_title
+      ORDER BY genre_count DESC
+    )
+    WHERE ROWNUM <= 1;
+
+  RETURN 'The Genre: ' ||  v_genre || ' (' || v_count || ')';
+
 END;
 /
 
-SELECT get_most_frequent_genre(TO_DATE('01-JAN-2020', 'DD-MON-YYYY'), TO_DATE('01-JAN-2021', 'DD-MON-YYYY')) 
+SELECT get_most_frequent_genre(TO_DATE('01-JAN-1940', 'DD-MON-YYYY'), 
+                                TO_DATE('01-JAN-2021', 'DD-MON-YYYY')) 
 FROM DUAL;
 
+
 SELECT g.gen_title, COUNT(*) as genre_count
+FROM movie m, mtype mt, genres g
+where  m.mov_id = mt.mov_id AND mt.gen_id = g.gen_id AND m.mov_releasedate 
+BETWEEN TO_DATE('01-JAN-1940', 'DD-MON-YYYY') AND TO_DATE('01-JAN-2021', 'DD-MON-YYYY')
+GROUP BY g.gen_title
+ORDER BY genre_count DESC;
+
+SELECT * FROM 
+( 
+  SELECT g.gen_title, COUNT(*) as genre_count
   FROM movie m, mtype mt, genres g
   where  m.mov_id = mt.mov_id AND mt.gen_id = g.gen_id AND m.mov_releasedate 
   BETWEEN TO_DATE('01-JAN-1940', 'DD-MON-YYYY') AND TO_DATE('01-JAN-2021', 'DD-MON-YYYY')
   GROUP BY g.gen_title
-  ORDER BY genre_count DESC;
+  ORDER BY genre_count DESC
+)
+where ROWNUM <= 1;
 
   
