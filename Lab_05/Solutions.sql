@@ -1,9 +1,14 @@
+DROP table Transaction;
+DROP table BALANCE;
+DROP table ACCOUNT_;
+DROP table AccountProperty;
+
+drop sequence account_serial_seq;
+
 
 SET SERVEROUTPUT ON SIZE 1000000
 
 -- 1 : Generating an account_id according to a structure
-
-drop sequence account_serial_seq;
 
 CREATE SEQUENCE account_serial_seq
 START WITH 1
