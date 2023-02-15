@@ -14,6 +14,8 @@ DATAFILE 'tbs3_data.dbf' SIZE 5m;
 -- 2
 CREATE USER tablespace_user Identified by t123 default TABLESPACE tbs2;
 
+DROP USER tablespace_user;
+
 alter user tablespace_user QUOTA 1m on tbs2; 
 
 alter user tablespace_user QUOTA 5m on tbs3;
@@ -52,16 +54,18 @@ CREATE TABLE COURSE_
 tablespace tbs2;
 
 
+-- 6
 
 SELECT tablespace_name , bytes /1024/1024 MB
 FROM dba_free_space
 WHERE tablespace_name = 'TBS2';
 
 
-SELECT tablespace_name ,SUM(BYTES)/1024/1024 "FREE SPACE(MB)"
+SELECT tablespace_name , SUM(BYTES)/1024/1024 "FREE SPACE(MB)"
 FROM DBA_FREE_SPACE GROUP BY TABLESPACE_NAME;
 
 
+-- 5 
 
 INSERT INTO DEPARTMENT_ VALUES ('CSE', '1');
 
@@ -84,13 +88,24 @@ END;
 /
 
 
+-- 7 & 8
 
+Alter TABLESPACE tbs2 ADD DATAFILE 'tbs2_data_2.dbf' SIZE 2M;    -- extending via adding data files 
 
-
+--or 
 
 ALTER DATABASE
-DATAFILE 'tbs3_data.dbf' RESIZE 10m;
+DATAFILE 'tbs3_data.dbf' RESIZE 10m;           -- extending via resizing data files
 
+
+-- 9
+
+SELECT tablespace_name, sum(bytes) / 1024 / 1024 "Size (MB)" 
+FROM dba_data_files 
+GROUP BY tablespace_name;
+
+
+-- 10 & 11
 
 DROP TABLESPACE tbs3
 INCLUDING CONTENTS AND DATAFILES
@@ -104,10 +119,14 @@ CASCADE CONSTRAINTS;
 
 -- bonus
 
+
+-- How many tables does each tablespace have
+
 SELECT COUNT(table_name), TABLESPACE_NAME
 FROM DBA_TABLES
 GROUP by tablespace_name;
 
+-- The tables that a particular tablespace has
 
 SELECT tablespace_name, table_name
 from DBA_tables
