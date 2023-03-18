@@ -1,0 +1,49 @@
+[{
+  "_id": {
+    "$oid": "641583a18af25edbd00307b1"
+  },
+  "user_id": {
+    "$oid": "64100a89d87392106fab76f4"
+  },
+  "content": "This has been MAK!",
+  "likes": [
+    "64157d5d8af25edbd00307af",
+    "64157ee38af25edbd00307b0"
+  ],
+  "comments": [
+    {
+      "text": "Noice!",
+      "user_id": {
+        "$oid": "64157d5d8af25edbd00307af"
+      }
+    },
+    {
+      "text": "Luv it!",
+      "user_id": {
+        "$oid": "64157ee38af25edbd00307b0"
+      }
+    }
+  ],
+  "created_at": {
+    "$date": {
+      "$numberLong": "1679131553317"
+    }
+  }
+},{
+  "_id": {
+    "$oid": "641583a18af25edbd00307b2"
+  },
+  "user_id": {
+    "$oid": "64157d5d8af25edbd00307af"
+  },
+  "content": "Yo!",
+  "likes": [
+    "64100a89d87392106fab76f4"
+  ],
+  "comments": [],
+  "created_at": {
+    "$date": {
+      "$numberLong": "1679131553317"
+    }
+  }
+}]

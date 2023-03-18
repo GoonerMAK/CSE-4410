@@ -1,0 +1,58 @@
+[{
+  "_id": {
+    "$oid": "64100a89d87392106fab76f4"
+  },
+  "name": "SAM",
+  "email": "SAM@example.com",
+  "password": "12345678",
+  "following": [],
+  "followers": []
+},{
+  "_id": {
+    "$oid": "64157d5d8af25edbd00307af"
+  },
+  "name": "DAM",
+  "email": "DAM@example.com",
+  "password": "12345678",
+  "following": [],
+  "followers": [
+    "64157ee38af25edbd00307b0",
+    "64100a89d87392106fab76f4"
+  ]
+},{
+  "_id": {
+    "$oid": "64157ee38af25edbd00307b0"
+  },
+  "name": "MAK Shelby",
+  "email": "mak_shelby@example.com",
+  "password": "12345678",
+  "phone_number": "01838292577",
+  "date_of_birth": {
+    "$date": {
+      "$numberLong": "1020038400000"
+    }
+  },
+  "address": "Mirpur, Dhaka, Bangladesh",
+  "profile_creation_date": {
+    "$date": {
+      "$numberLong": "1679130339592"
+    }
+  },
+  "working_status": "Software Developer",
+  "bios": "Gooner",
+  "hobbies": [
+    "Music",
+    "Movies",
+    "Gaming",
+    "Sleeping"
+  ],
+  "following": [
+    {
+      "$oid": "64100a89d87392106fab76f4"
+    },
+    {
+      "$oid": "64157d5d8af25edbd00307af"
+    }
+  ],
+  "followers": []
+}]
